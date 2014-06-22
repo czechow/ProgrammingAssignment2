@@ -1,15 +1,41 @@
-## Put comments here that give an overall description of what your
-## functions do
+## Utility functions to cache matrix inversion results
 
-## Write a short comment describing this function
 
-makeCacheMatrix <- function(x = matrix()) {
+## A wrapper around a matrix to deliver cache functionality
+makeCachedMatrix <- function(x = matrix()) {
 
+	## Cached result 
+	invx <- NULL
+
+	get <- function() x
+
+	set <- function(m) { 
+		x <<- m
+		invx <<- NULL
+	}
+	
+	getinv <- function() invx
+
+	setinv <- function(inv) invx <<- inv
+
+
+	# Interface to the outside world
+	list(get = get, set = set, getinv = getinv, setinv = setinv)
 }
 
 
-## Write a short comment describing this function
+## Solve with caching
+## As a first argument pass an object returned by makeCacheMatrix function
+## Other args will be passed to "solve" function
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+	
+	if ( is.null(x$getinv()) )
+	{
+		x$setinv(solve(x$get(), ...))
+		print("Solving matrix")		# Info only ;-)
+	}
+	
+	x$getinv()
 }
+
